@@ -1,0 +1,47 @@
+name: Build
+
+# Runs on every push and pull request so a build/compile regression is
+# caught immediately - this is also the "real" build verification for this
+# repo, since WinForms + Win32 interop can only be honestly compiled and
+# run on an actual Windows machine (the windows-latest runner below).
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore src/DoomsdayClock/DoomsdayClock.csproj
+
+      - name: Build (Debug, quick compile check)
+        run: dotnet build src/DoomsdayClock/DoomsdayClock.csproj -c Debug --no-restore
+
+      - name: Publish portable single-file exe (Release)
+        run: >
+          dotnet publish src/DoomsdayClock/DoomsdayClock.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -o publish
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DoomsdayClock-portable-win-x64
+          path: publish/DoomsdayClock.exe
+          if-no-files-found: error
