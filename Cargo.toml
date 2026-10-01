@@ -1,0 +1,70 @@
+[package]
+name = "doomsday-clock"
+version = "2.0.0"
+edition = "2024"
+rust-version = "1.95"
+description = "A countdown-to-a-date desktop wallpaper for Windows, with rotating quotes and a Windows 7 Aero / Windows 11 dual-skin settings app."
+license = "MIT"
+publish = false
+
+[[bin]]
+name = "DoomsdayClock"
+path = "src/main.rs"
+
+# -----------------------------------------------------------------------------
+# Dependency policy (see README "Dependencies, and why each one exists"):
+#   * Every crate here earns its place by replacing a large amount of
+#     hand-written, hard-to-get-right code. Nothing is pulled in for
+#     convenience alone.
+#   * Default features are switched off wherever a crate's defaults drag in
+#     code paths we never execute (PNG codecs, accessibility trees, bundled
+#     fonts, Wayland, ...).
+# -----------------------------------------------------------------------------
+[dependencies]
+# Settings window. glow = OpenGL renderer (far lighter than wgpu for a
+# small, mostly idle 2D window). x11 is only compiled on Linux, where it lets
+# the UI be developed and screenshotted; it is inert in Windows builds.
+eframe = { version = "0.36", default-features = false, features = ["glow", "x11"] }
+
+# Wallpaper rasteriser: anti-aliased paths, no GPU, no system deps.
+tiny-skia = { version = "0.12", default-features = false, features = ["std", "simd"] }
+
+# System font discovery ("which file is 'Gill Sans Nova Ultra Bold'?") and
+# glyph outlines. fontdb re-uses ttf-parser internally, so this is one parser.
+fontdb = { version = "0.24", default-features = false, features = ["std", "fs", "memmap"] }
+ttf-parser = { version = "0.25", default-features = false, features = ["std", "opentype-layout", "apple-layout", "variable-fonts", "glyph-names"] }
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Local calendar date/time. std has no notion of the local timezone.
+chrono = { version = "0.4", default-features = false, features = ["std", "clock", "serde"] }
+
+[target.'cfg(windows)'.dependencies]
+# To read the settings window's HWND from eframe (same version eframe uses).
+raw-window-handle = "0.6"
+windows = { version = "0.62", features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Dwm",
+    "Win32_Graphics_Gdi",
+    "Win32_System_Com",
+    "Win32_System_Registry",
+    "Win32_System_Threading",
+    "Win32_UI_Controls",
+    "Win32_UI_HiDpi",
+    "Win32_UI_Shell",
+    "Win32_UI_Shell_Common",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true
+
+# Fast-to-compile but still optimised dependency builds while developing, so
+# the debug UI isn't sluggish when painting gradients.
+[profile.dev.package."*"]
+opt-level = 2

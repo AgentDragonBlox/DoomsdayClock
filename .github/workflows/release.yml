@@ -1,11 +1,10 @@
 name: Release
 
-# Publishes a portable DoomsdayClock.exe and attaches it to a GitHub Release
-# whenever a version tag (e.g. v1.0.0) is pushed.
+# Push a tag like v2.0.0 and this attaches a freshly built DoomsdayClock.exe
+# to a GitHub Release with auto-generated notes.
 on:
   push:
-    tags:
-      - "v*"
+    tags: ["v*"]
 
 permissions:
   contents: write
@@ -13,30 +12,20 @@ permissions:
 jobs:
   release:
     runs-on: windows-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up .NET 8 SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "8.0.x"
+      - name: Install Rust (stable)
+        run: rustup update stable --no-self-update && rustup default stable
 
-      - name: Restore
-        run: dotnet restore src/DoomsdayClock/DoomsdayClock.csproj
+      - name: Test
+        run: cargo test --locked
 
-      - name: Publish portable single-file exe
-        run: >
-          dotnet publish src/DoomsdayClock/DoomsdayClock.csproj
-          -c Release
-          -r win-x64
-          --self-contained true
-          -p:PublishSingleFile=true
-          -o publish
+      - name: Build release exe
+        run: cargo build --release --locked
 
-      - name: Create GitHub Release
+      - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
-          files: publish/DoomsdayClock.exe
+          files: target/release/DoomsdayClock.exe
           generate_release_notes: true

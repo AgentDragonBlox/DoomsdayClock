@@ -1,0 +1,770 @@
+{
+ "quotes": [
+  {
+   "text": "It is not that we have a short time to live, but that we waste a lot of it.",
+   "author": "Seneca"
+  },
+  {
+   "text": "While we are postponing, life speeds by.",
+   "author": "Seneca"
+  },
+  {
+   "text": "Begin at once to live, and count each separate day as a separate life.",
+   "author": "Seneca"
+  },
+  {
+   "text": "Hold every hour in your grasp. Lay hold of today's task, and you will not need to depend so much upon tomorrow's.",
+   "author": "Seneca"
+  },
+  {
+   "text": "Nothing is ours except time.",
+   "author": "Seneca"
+  },
+  {
+   "text": "Life is long if you know how to use it.",
+   "author": "Seneca"
+  },
+  {
+   "text": "Waste no more time arguing about what a good man should be. Be one.",
+   "author": "Marcus Aurelius"
+  },
+  {
+   "text": "Do every act of your life as though it were the very last act of your life.",
+   "author": "Marcus Aurelius"
+  },
+  {
+   "text": "You could leave life right now. Let that determine what you do and say and think.",
+   "author": "Marcus Aurelius"
+  },
+  {
+   "text": "Confine yourself to the present.",
+   "author": "Marcus Aurelius"
+  },
+  {
+   "text": "The impediment to action advances action. What stands in the way becomes the way.",
+   "author": "Marcus Aurelius"
+  },
+  {
+   "text": "Think of yourself as dead. You have lived your life. Now take what's left and live it properly.",
+   "author": "Marcus Aurelius"
+  },
+  {
+   "text": "If it is not right, do not do it; if it is not true, do not say it.",
+   "author": "Marcus Aurelius"
+  },
+  {
+   "text": "First say to yourself what you would be; and then do what you have to do.",
+   "author": "Epictetus"
+  },
+  {
+   "text": "No great thing is created suddenly.",
+   "author": "Epictetus"
+  },
+  {
+   "text": "How long are you going to wait before you demand the best for yourself?",
+   "author": "Epictetus"
+  },
+  {
+   "text": "Well begun is half done.",
+   "author": "Aristotle"
+  },
+  {
+   "text": "The beginning is the most important part of the work.",
+   "author": "Plato"
+  },
+  {
+   "text": "Life is short, the art long, opportunity fleeting, experiment treacherous, judgement difficult.",
+   "author": "Hippocrates"
+  },
+  {
+   "text": "A journey of a thousand miles begins with a single step.",
+   "author": "Lao Tzu"
+  },
+  {
+   "text": "Seize the day, trusting as little as possible in tomorrow.",
+   "author": "Horace"
+  },
+  {
+   "text": "He who has begun has half done. Dare to be wise; begin!",
+   "author": "Horace"
+  },
+  {
+   "text": "Meanwhile time flies; it flies never to return.",
+   "author": "Virgil"
+  },
+  {
+   "text": "Dripping water hollows out stone.",
+   "author": "Ovid"
+  },
+  {
+   "text": "Not a day without a line.",
+   "author": "Pliny the Elder"
+  },
+  {
+   "text": "Anyone can hold the helm when the sea is calm.",
+   "author": "Publilius Syrus"
+  },
+  {
+   "text": "Practice is the best of all instructors.",
+   "author": "Publilius Syrus"
+  },
+  {
+   "text": "Never promise more than you can perform.",
+   "author": "Publilius Syrus"
+  },
+  {
+   "text": "Lost time is never found again.",
+   "author": "Benjamin Franklin"
+  },
+  {
+   "text": "You may delay, but time will not.",
+   "author": "Benjamin Franklin"
+  },
+  {
+   "text": "Dost thou love life? Then do not squander time, for that's the stuff life is made of.",
+   "author": "Benjamin Franklin"
+  },
+  {
+   "text": "Well done is better than well said.",
+   "author": "Benjamin Franklin"
+  },
+  {
+   "text": "Never leave that till tomorrow which you can do today.",
+   "author": "Benjamin Franklin"
+  },
+  {
+   "text": "Better three hours too soon than a minute too late.",
+   "author": "William Shakespeare"
+  },
+  {
+   "text": "I wasted time, and now doth time waste me.",
+   "author": "William Shakespeare"
+  },
+  {
+   "text": "Our doubts are traitors, and make us lose the good we oft might win, by fearing to attempt.",
+   "author": "William Shakespeare"
+  },
+  {
+   "text": "Procrastination is the thief of time.",
+   "author": "Edward Young"
+  },
+  {
+   "text": "Know the true value of time; snatch, seize, and enjoy every moment of it. No idleness, no laziness, no procrastination.",
+   "author": "Lord Chesterfield"
+  },
+  {
+   "text": "Take care of the minutes, for the hours will take care of themselves.",
+   "author": "Lord Chesterfield"
+  },
+  {
+   "text": "Time is what we want most, but what we use worst.",
+   "author": "William Penn"
+  },
+  {
+   "text": "As if you could kill time without injuring eternity.",
+   "author": "Henry David Thoreau"
+  },
+  {
+   "text": "It is not enough to be industrious; so are the ants. What are you industrious about?",
+   "author": "Henry David Thoreau"
+  },
+  {
+   "text": "Write it on your heart that every day is the best day in the year.",
+   "author": "Ralph Waldo Emerson"
+  },
+  {
+   "text": "Nothing great was ever achieved without enthusiasm.",
+   "author": "Ralph Waldo Emerson"
+  },
+  {
+   "text": "Nothing is worth more than this day.",
+   "author": "Johann Wolfgang von Goethe"
+  },
+  {
+   "text": "A man who dares to waste one hour of time has not discovered the value of life.",
+   "author": "Charles Darwin"
+  },
+  {
+   "text": "Genius is one per cent inspiration and ninety-nine per cent perspiration.",
+   "author": "Thomas Edison"
+  },
+  {
+   "text": "As a well-spent day brings happy sleep, so a life well spent brings happy death.",
+   "author": "Leonardo da Vinci"
+  },
+  {
+   "text": "Do what you can, with what you have, where you are.",
+   "author": "Theodore Roosevelt"
+  },
+  {
+   "text": "Nothing in the world is worth having or worth doing unless it means effort, pain, difficulty.",
+   "author": "Theodore Roosevelt"
+  },
+  {
+   "text": "Never put off till tomorrow what you can do the day after tomorrow just as well.",
+   "author": "Mark Twain"
+  },
+  {
+   "text": "Courage is resistance to fear, mastery of fear, not absence of fear.",
+   "author": "Mark Twain"
+  },
+  {
+   "text": "What we hope ever to do with ease, we must learn first to do with diligence.",
+   "author": "Samuel Johnson"
+  },
+  {
+   "text": "Great works are performed not by strength but by perseverance.",
+   "author": "Samuel Johnson"
+  },
+  {
+   "text": "The future is purchased by the present.",
+   "author": "Samuel Johnson"
+  },
+  {
+   "text": "We are what we repeatedly do.",
+   "author": "Will Durant"
+  },
+  {
+   "text": "He that can have patience can have what he will.",
+   "author": "Benjamin Franklin"
+  },
+  {
+   "text": "Haste makes waste.",
+   "author": "Proverb"
+  },
+  {
+   "text": "The best time to plant a tree was twenty years ago. The second best time is now.",
+   "author": "Proverb"
+  },
+  {
+   "text": "Tomorrow is often the busiest day of the week.",
+   "author": "Spanish proverb"
+  },
+  {
+   "text": "Fall seven times, stand up eight.",
+   "author": "Japanese proverb"
+  },
+  {
+   "text": "Little by little, one travels far.",
+   "author": "Spanish proverb"
+  },
+  {
+   "text": "The day you plant the seed is not the day you eat the fruit.",
+   "author": "Proverb"
+  },
+  {
+   "text": "Time and tide wait for no man.",
+   "author": "Proverb"
+  },
+  {
+   "text": "A goal without a plan is just a wish.",
+   "author": "Proverb"
+  },
+  {
+   "text": "Slow and steady wins the race.",
+   "author": "Aesop"
+  },
+  {
+   "text": "It is easy to be brave from a safe distance.",
+   "author": "Aesop"
+  },
+  {
+   "text": "Self-help is the best help.",
+   "author": "Aesop"
+  },
+  {
+   "text": "We are more often frightened than hurt; and we suffer more from imagination than from reality.",
+   "author": "Seneca"
+  },
+  {
+   "text": "Very little is needed to make a happy life; it is all within yourself, in your way of thinking.",
+   "author": "Marcus Aurelius"
+  },
+  {
+   "text": "It is impossible for a man to learn what he thinks he already knows.",
+   "author": "Epictetus"
+  },
+  {
+   "text": "The secret of success is constancy to purpose.",
+   "author": "Benjamin Disraeli"
+  },
+  {
+   "text": "Action may not always bring happiness; but there is no happiness without action.",
+   "author": "Benjamin Disraeli"
+  },
+  {
+   "text": "Every tick is a vote for who you are becoming."
+  },
+  {
+   "text": "The work doesn't care how you feel about it. Begin anyway."
+  },
+  {
+   "text": "Set the timer. Open the file. Go."
+  },
+  {
+   "text": "Treat today like the deadline is next week."
+  },
+  {
+   "text": "A tidy plan is worth nothing until it gets messy with work."
+  },
+  {
+   "text": "Light a candle under one task, not ten."
+  },
+  {
+   "text": "You are one good week away from being ahead."
+  },
+  {
+   "text": "Start ugly. Finish proud."
+  },
+  {
+   "text": "Pick the task that scares you. Do that one first."
+  },
+  {
+   "text": "Silence the noise. Keep the promise."
+  },
+  {
+   "text": "The deadline is the same for the anxious and the prepared. Choose prepared."
+  },
+  {
+   "text": "Every day you finish something is a good day."
+  },
+  {
+   "text": "Don't let a slow day become a lost day."
+  },
+  {
+   "text": "Halfway is a great place to keep going from."
+  },
+  {
+   "text": "The best revision tool is a finished draft."
+  },
+  {
+   "text": "You owe the deadline nothing. You owe yourself everything."
+  },
+  {
+   "text": "Count the days. Then make them shorter by working."
+  },
+  {
+   "text": "Effort today, ease tomorrow."
+  },
+  {
+   "text": "Let the clock push you, not panic you."
+  },
+  {
+   "text": "Your calendar is a map. Today is where you are standing."
+  },
+  {
+   "text": "Pressure is a privilege when the goal is yours."
+  },
+  {
+   "text": "Finish lines are crossed one step at a time."
+  },
+  {
+   "text": "Make progress visible, even if it's small."
+  },
+  {
+   "text": "Win today. Then do it again."
+  },
+  {
+   "text": "The deadline doesn't move. You do."
+  },
+  {
+   "text": "Today is the only day you can actually work on."
+  },
+  {
+   "text": "Somewhere between now and the deadline is the version of you that finished."
+  },
+  {
+   "text": "You don't need more time. You need to start the time you have."
+  },
+  {
+   "text": "Every square on the calendar is a decision."
+  },
+  {
+   "text": "The clock isn't against you. It's just honest."
+  },
+  {
+   "text": "One focused hour beats a distracted day."
+  },
+  {
+   "text": "Finished is a feature."
+  },
+  {
+   "text": "Do the hard part first. The rest gets lighter."
+  },
+  {
+   "text": "Make today count. Tomorrow is already busy."
+  },
+  {
+   "text": "Small steps, every day, add up to the finish line."
+  },
+  {
+   "text": "Momentum is built, not found."
+  },
+  {
+   "text": "The countdown is a promise you made to yourself."
+  },
+  {
+   "text": "Show up. Then show up again tomorrow."
+  },
+  {
+   "text": "The best plan is the one you start today."
+  },
+  {
+   "text": "Future you is counting on present you."
+  },
+  {
+   "text": "Progress hides in boring days."
+  },
+  {
+   "text": "There is no perfect moment. There is only this one."
+  },
+  {
+   "text": "Start before you feel ready."
+  },
+  {
+   "text": "Excuses don't shorten the countdown."
+  },
+  {
+   "text": "Each day survived is a day closer. Each day used is a day ahead."
+  },
+  {
+   "text": "Work quietly. Let the finish line make the noise."
+  },
+  {
+   "text": "A little progress each day is still progress."
+  },
+  {
+   "text": "Done is better than perfect, and perfect is rarely on time."
+  },
+  {
+   "text": "Protect your mornings. That's where the work lives."
+  },
+  {
+   "text": "If it matters, schedule it."
+  },
+  {
+   "text": "Write the first line. The second one is easier."
+  },
+  {
+   "text": "Big goals are just small tasks in a trench coat."
+  },
+  {
+   "text": "The deadline is closer than it looks in your head."
+  },
+  {
+   "text": "Busy is not the same as productive."
+  },
+  {
+   "text": "Close one tab. Finish one thing."
+  },
+  {
+   "text": "You are allowed to be tired. You are not allowed to quit today."
+  },
+  {
+   "text": "Consistency is quieter than motivation, and far more reliable."
+  },
+  {
+   "text": "The hardest part of the climb is the part you haven't started."
+  },
+  {
+   "text": "Plan the week, win the day, repeat."
+  },
+  {
+   "text": "Today's effort is tomorrow's head start."
+  },
+  {
+   "text": "Time spent worrying is time spent twice."
+  },
+  {
+   "text": "Don't count the days. Make the days count toward something."
+  },
+  {
+   "text": "A clear goal turns a long day into a short list."
+  },
+  {
+   "text": "You have exactly as many hours as everyone who finished."
+  },
+  {
+   "text": "Breaks are part of the work. Endless breaks are not."
+  },
+  {
+   "text": "Ship the draft. Polish later."
+  },
+  {
+   "text": "The calendar keeps score. Make it a good one."
+  },
+  {
+   "text": "Hard days count double."
+  },
+  {
+   "text": "Doubt is loud. Progress is louder."
+  },
+  {
+   "text": "The work you avoid is usually the work that matters."
+  },
+  {
+   "text": "Some days you sprint. Some days you just don't stop."
+  },
+  {
+   "text": "Your goal deserves your attention more than your phone does."
+  },
+  {
+   "text": "Measure the day by what moved forward."
+  },
+  {
+   "text": "What you do today is the only lever you can pull."
+  },
+  {
+   "text": "The finish line remembers who kept walking."
+  },
+  {
+   "text": "Deep work, shallow inbox."
+  },
+  {
+   "text": "Fewer tasks, finished fully."
+  },
+  {
+   "text": "Rest when you're done with today's part, not before you start it."
+  },
+  {
+   "text": "Comfort is expensive when the clock is running."
+  },
+  {
+   "text": "Start small. Start now. Start again if you have to."
+  },
+  {
+   "text": "You won't find time. You make it."
+  },
+  {
+   "text": "One page a day is a book by the deadline."
+  },
+  {
+   "text": "Clarity comes from action, not from waiting."
+  },
+  {
+   "text": "A deadline is just a date until you decide it's a commitment."
+  },
+  {
+   "text": "Leave today with something finished."
+  },
+  {
+   "text": "The countdown only goes one way. So should you."
+  },
+  {
+   "text": "Effort compounds. So does delay."
+  },
+  {
+   "text": "Be the person who did it, not the person who planned to."
+  },
+  {
+   "text": "When in doubt, do the next smallest thing."
+  },
+  {
+   "text": "Tired is temporary. Regret lasts longer."
+  },
+  {
+   "text": "The secret is boring: work, rest, repeat."
+  },
+  {
+   "text": "Turn the big thing into today's small thing."
+  },
+  {
+   "text": "Your schedule should look like your priorities."
+  },
+  {
+   "text": "Nobody remembers the late start. Everyone remembers the finish."
+  },
+  {
+   "text": "Don't break the chain."
+  },
+  {
+   "text": "An hour of focus is a gift you give your future self."
+  },
+  {
+   "text": "You've already survived every hard day so far."
+  },
+  {
+   "text": "Tomorrow you will wish you had started today."
+  },
+  {
+   "text": "Respect the deadline and it will respect you back."
+  },
+  {
+   "text": "Keep the promise you made on day one."
+  },
+  {
+   "text": "Less scrolling, more building."
+  },
+  {
+   "text": "The clock is ticking. So is your progress."
+  },
+  {
+   "text": "There's still time. Use it like there isn't."
+  },
+  {
+   "text": "Do something today your future self will thank you for."
+  },
+  {
+   "text": "The most productive thing is often the next obvious thing."
+  },
+  {
+   "text": "Bad days make good stories once you're finished."
+  },
+  {
+   "text": "Begin anywhere. Just begin."
+  },
+  {
+   "text": "Your best work happens after the urge to quit."
+  },
+  {
+   "text": "You're not behind. You're just not done yet."
+  },
+  {
+   "text": "Count wins, not hours."
+  },
+  {
+   "text": "The days are long and the countdown is short."
+  },
+  {
+   "text": "Today's distraction is tomorrow's crunch."
+  },
+  {
+   "text": "There is no shortcut, but there is a start."
+  },
+  {
+   "text": "Make the next hour the best hour of the day."
+  },
+  {
+   "text": "Your goals don't care about your mood. Work anyway."
+  },
+  {
+   "text": "Keep going. The number is getting smaller."
+  },
+  {
+   "text": "Quiet progress is still progress."
+  },
+  {
+   "text": "Prepare like it's tomorrow. Work like it's today."
+  },
+  {
+   "text": "Every day you work is a day the deadline loses its teeth."
+  },
+  {
+   "text": "The pressure you feel is the importance of what you're doing."
+  },
+  {
+   "text": "Show the work, not the worry."
+  },
+  {
+   "text": "Hours are cheap. Focused hours are priceless."
+  },
+  {
+   "text": "What gets started gets finished."
+  },
+  {
+   "text": "Turn panic into a plan."
+  },
+  {
+   "text": "If not now, then exactly when?"
+  },
+  {
+   "text": "Practice the boring basics until they're automatic."
+  },
+  {
+   "text": "Small daily wins are how big deadlines are beaten."
+  },
+  {
+   "text": "Trust the process. Then do the process."
+  },
+  {
+   "text": "Keep your eyes on the date and your hands on the work."
+  },
+  {
+   "text": "You can rest at the finish line."
+  },
+  {
+   "text": "Do it scared. Do it tired. Just do it today."
+  },
+  {
+   "text": "The work is the shortcut."
+  },
+  {
+   "text": "Time is the one thing you can't refill."
+  },
+  {
+   "text": "Finish what you started this morning."
+  },
+  {
+   "text": "Every minute you spend planning saves ten in execution."
+  },
+  {
+   "text": "The deadline is a gift: it tells you when to stop thinking and start doing."
+  },
+  {
+   "text": "Your future is decided by what you do with today's hours."
+  },
+  {
+   "text": "Nothing changes if nothing changes."
+  },
+  {
+   "text": "No zero days."
+  },
+  {
+   "text": "Look how far you've come. Now look at the date."
+  },
+  {
+   "text": "Small, steady, stubborn."
+  },
+  {
+   "text": "Today is a good day to get ahead."
+  },
+  {
+   "text": "Earn your weekend."
+  },
+  {
+   "text": "Ten minutes of work beats an hour of worrying."
+  },
+  {
+   "text": "Get it done, then get it right."
+  },
+  {
+   "text": "Make room for the work that matters."
+  },
+  {
+   "text": "Ambition without a calendar is just a dream."
+  },
+  {
+   "text": "Give today everything it needs. No more, no less."
+  },
+  {
+   "text": "The race is long. Keep your pace."
+  },
+  {
+   "text": "The grind is where the gap closes."
+  },
+  {
+   "text": "Write it down. Break it down. Knock it down."
+  },
+  {
+   "text": "Fewer meetings, more making."
+  },
+  {
+   "text": "When it's hard, you're growing."
+  },
+  {
+   "text": "Your attention is your most valuable resource. Spend it here."
+  },
+  {
+   "text": "Stop waiting for motivation. It follows action."
+  },
+  {
+   "text": "The number on your screen is a reminder, not a threat."
+  },
+  {
+   "text": "Plan tonight, execute tomorrow."
+  },
+  {
+   "text": "The sooner you start, the calmer you finish."
+  }
+ ]
+}

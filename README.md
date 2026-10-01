@@ -1,253 +1,332 @@
 # Doomsday Clock
 
-A tiny Windows utility that turns your desktop wallpaper into a daily
-countdown to a date you pick — "47 Days left till 25-12-2026" in huge bold
-type on a black background, updated automatically every day, with an option
-to have the text fade from white to red as the deadline gets closer.
+A Windows desktop countdown that lives on your wallpaper.
 
-No installer, no background service eating RAM, no telemetry, no third-party
-libraries. One portable `.exe`, one Windows Scheduled Task.
+Pick a date. Every day your wallpaper becomes a black canvas reading
+**“47 Days left till 25‑12‑2026”** in huge type, with a rotating quote
+underneath. Optionally the text warms from white to red as the deadline
+closes in.
+
+The settings app comes in two complete skins you can switch between live:
+**Aero** (a faithful Windows 7 revival: glass frame, glossy buttons, green
+progress bar) and **Modern** (Windows 11: Mica, Fluent cards, light/dark).
+
+![Wallpaper](docs/screenshots/wallpaper.png)
+
+| Aero (Windows 7) | Modern (Windows 11, dark) |
+|---|---|
+| ![Aero](docs/screenshots/aero-countdown.png) | ![Modern dark](docs/screenshots/modern-dark.png) |
+| ![Aero quotes](docs/screenshots/aero-quotes.png) | ![Modern light](docs/screenshots/modern-light.png) |
+
+> Screenshots are taken from the development build, which uses stand-in
+> fonts for Segoe UI. On Windows the app uses the real system fonts.
 
 ---
 
 ## Contents
 
-- [What it does](#what-it-does)
-- [How it works (architecture)](#how-it-works-architecture)
-- [Building it yourself](#building-it-yourself)
-- [Running it](#running-it)
-- [The config file](#the-config-file)
-- [UI design philosophy](#ui-design-philosophy)
+- [Features](#features)
+- [Install and use](#install-and-use)
+- [How it works](#how-it-works)
+- [Quotes: file format, importing, rotation](#quotes)
+- [Performance](#performance)
+- [Building from source](#building-from-source)
 - [How to change common things](#how-to-change-common-things)
+- [Design notes](#design-notes)
+- [Troubleshooting](#troubleshooting)
 - [Uninstalling](#uninstalling)
-- [Why these engineering choices?](#why-these-engineering-choices)
 
 ---
 
-## What it does
+## Features
 
-1. You open `DoomsdayClock.exe`, pick a target date, and choose whether the
-   countdown text should stay white or gradually fade to red as the date
-   approaches.
-2. You click **Save & Activate**. The app immediately:
-   - renders today's wallpaper (a black canvas with the countdown text,
-     auto-sized to fill the screen) and sets it as your desktop background,
-     and
-   - installs a per-user **Windows Scheduled Task** that silently re-runs
-     the same rendering step once a day (at 00:05, and again at every
-     logon, so a machine that was asleep at 00:05 still catches up).
-3. Every day, without the app's window ever opening, your wallpaper
-   updates itself to show the new day count.
+- **Daily countdown wallpaper.** Black background, centred text, sized to
+  fill each monitor. The default font is *Gill Sans Nova Ultra Bold*, with
+  graceful fallbacks if it isn't installed.
+- **White or fade-to-red.** Text either stays white or shifts linearly from
+  white (the day you set the countdown) to red (the deadline).
+- **Rotating quotes.** 231 quotes ship with the app. Add your own in the app,
+  import a JSON file, or edit `quotes.json` by hand.
+  - New quotes always show first, newest first, then the whole library
+    reshuffles.
+  - Change the quote **daily, weekly, monthly, or every N hours** (minimum 1).
+- **Every monitor done properly.** One image per monitor at its native
+  resolution, so the text is centred on each screen and never split across a
+  bezel.
+- **Nothing running in the background.** A Windows Scheduled Task starts the
+  app for a fraction of a second at 00:05, at sign-in, and (only for custom
+  intervals) every N hours. Then it exits.
+- **Two skins, switchable instantly.** Aero uses real Acrylic blur behind
+  its glass frame on Windows 11 22H2+. Modern uses Mica. Both fall back to
+  painted surfaces on older Windows.
+- **One portable `.exe`, about 5 MB.** No installer, no runtime, no admin
+  rights, no network access ever.
 
-No process sits resident in memory between runs — the Scheduled Task
-launches the `.exe` for a fraction of a second, it draws one image, sets it,
-and exits. This is the leanest possible way to do "runs every day in the
-background" on Windows.
+## Install and use
 
-## How it works (architecture)
+1. Download `DoomsdayClock.exe` from the [Releases](../../releases) page (or
+   build it, see below). Put it somewhere permanent, for example
+   `C:\Tools\DoomsdayClock\`. The scheduled task points at this location.
+2. Run it. Pick your deadline, colour mode and quote schedule.
+3. Click **Save & Activate**. Your wallpaper updates immediately and a
+   per-user scheduled task keeps it current from then on.
 
+Command-line modes (handy for scripts, and what the scheduled task uses):
+
+| Command | What it does |
+|---|---|
+| `DoomsdayClock.exe` | Opens the settings window. |
+| `DoomsdayClock.exe --update` | Silent refresh: rotate the quote if due, redraw only if something changed. |
+| `DoomsdayClock.exe --next-quote` | Skip to the next quote and apply it now. |
+| `DoomsdayClock.exe --render out.bmp 2560x1440` | Render a wallpaper to a file without applying it. |
+| `DoomsdayClock.exe --uninstall` | Remove the scheduled task and all settings. |
+
+## How it works
+
+```mermaid
+flowchart LR
+    A[DoomsdayClock.exe] -->|no args| UI[Settings window<br/>egui, Aero or Modern skin]
+    A -->|--update<br/>from Task Scheduler| U[wallpaper::update]
+    UI -->|Save & Activate| U
+    U --> Q[QuoteStore<br/>rotate if due]
+    U --> K{Anything changed?}
+    K -->|no| X[Exit, nothing written]
+    K -->|yes| R[render.rs<br/>tiny-skia, one image per monitor size]
+    R --> W[platform::apply_wallpapers<br/>IDesktopWallpaper per monitor]
+    UI -->|Save & Activate| T[platform::install_task<br/>schtasks + XML]
 ```
-                    ┌───────────────────────┐
-   You double-click │      Program.cs        │  no args
-   the .exe    ───► │  (routes by argv[0])   │ ───────────────► SettingsForm (UI)
-                    └───────────┬────────────┘
-                                 │ --update
-                                 ▼
-                    ┌───────────────────────┐
-   Scheduled Task    │   WallpaperSetter      │
-   runs this daily ► │  .ApplyForToday(...)   │
-                    └───────────┬────────────┘
-                                 │
-                 ┌───────────────┴────────────────┐
-                 ▼                                 ▼
-      ┌─────────────────────┐          ┌─────────────────────────┐
-      │  WallpaperRenderer    │          │  Native SystemParameters  │
-      │  (GDI+ draws the       │ Bitmap  │  Info(SPI_SETDESKWALLPAPER)│
-      │  black canvas + text)  │────────►│  + registry WallpaperStyle │
-      └──────────┬──────────┘          └─────────────────────────┘
-                 │ uses
-        ┌────────┴────────┐
-        ▼                 ▼
- FontResolver     ColorInterpolator
- (font fallback)   (white → red math)
-```
+
+The headless path never creates a window or touches the GPU. It loads two
+small JSON files, opens two font files, draws with the CPU and exits.
+
+### Source map
 
 | File | Responsibility |
 |---|---|
-| `Program.cs` | Entry point. Dispatches to the UI, the silent updater, or `--uninstall` based on the command-line argument. This is the **only** file that knows both "modes" exist. |
-| `AppConfig.cs` | The settings model (target date, colour mode, font) plus JSON load/save to `%AppData%\DoomsdayClock\config.json`. The single source of truth both the UI and the silent updater read. |
-| `WallpaperRenderer.cs` | Pure rendering: given a config and a date, produces a `Bitmap`. Knows nothing about files, the registry, or Windows APIs — this is what makes it reusable for both the real wallpaper *and* the UI's live preview. |
-| `ColorInterpolator.cs` | Isolated, allocation-free white→red colour math. No GDI+, no I/O — easy to reason about on its own. |
-| `FontResolver.cs` | Resolves "Gill Sans Nova Ultra Bold" to an installed font, walking a fallback chain if it isn't present on the machine. |
-| `WallpaperSetter.cs` | Glue: calls the renderer, writes the `.bmp`, and calls into `Native/NativeMethods.cs` + the registry to actually apply it as wallpaper. |
-| `TaskSchedulerService.cs` | Installs/queries/removes the daily Scheduled Task via `schtasks.exe`. |
-| `Native/NativeMethods.cs` | Every raw Win32 P/Invoke signature in the app, in one auditable place. |
-| `UI/SettingsForm.cs` | The one window. Wires up the controls, calls `AppConfig`, `WallpaperSetter`, and `TaskSchedulerService`. |
-| `UI/GlassButton.cs`, `UI/GlassPanel.cs`, `UI/AeroPalette.cs` | The hand-painted "Aero glass" custom controls and shared palette/gradient helpers — see [UI design philosophy](#ui-design-philosophy). |
+| `src/main.rs` | Entry point. Routes command-line modes. |
+| `src/config.rs` | Settings model, JSON load/save, quote rotation schedule (`Rotation::is_due`). |
+| `src/countdown.rs` | Pure maths: headline text, fade colour, progress. |
+| `src/quotes.rs` | Quote library, import/merge, dedupe, the newest-first/shuffle queue. |
+| `src/fonts.rs` | Finds font files by family name, fallback chain, on-disk cache. |
+| `src/render.rs` | Draws the wallpaper (tiny-skia + ttf-parser), word-wraps quotes, writes BMP. |
+| `src/wallpaper.rs` | Orchestrates one update: rotate, skip-if-unchanged, render per monitor, apply. |
+| `src/paths.rs` | Where files live; atomic writes. |
+| `src/platform/windows.rs` | **All** Windows FFI: wallpaper COM, Task Scheduler, DWM Mica/Acrylic, file dialog. |
+| `src/platform/fallback.rs` | Non-Windows stand-in so the app builds, runs and screenshots on Linux. |
+| `src/ui/mod.rs` | The settings window: state, both skins' chrome, the three pages. |
+| `src/ui/theme.rs` | Colour tables and type ramp for both skins. |
+| `src/ui/widgets.rs` | Skinned controls: buttons, nav, cards, radios, toggles, spin box, progress bar, text fields. |
+| `src/ui/paint.rs` | Gradient meshes, glows, vector icons, the logo. |
+| `src/ui/calendar.rs` | Month-view date picker in both skins. |
+| `src/ui/icon.rs` | Taskbar icon, rasterised at startup (no image assets in the repo). |
+| `assets/quotes.json` | Starter quote library, compiled into the exe. |
 
-## Building it yourself
+### Where your data lives
 
-You need the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-on **Windows** (WinForms projects can only be fully restored/compiled on
-Windows, since the Windows Desktop reference assemblies are Windows-only).
+| Path | Contents |
+|---|---|
+| `%APPDATA%\DoomsdayClock\config.json` | Settings. |
+| `%APPDATA%\DoomsdayClock\quotes.json` | Your quote library (edit freely). |
+| `%APPDATA%\DoomsdayClock\state.json` | Rotation state. Safe to delete; it just reshuffles. |
+| `%LOCALAPPDATA%\DoomsdayClock\` | Rendered wallpapers and the font cache. Safe to delete. |
 
-```powershell
-# Clone, then from the repo root:
-dotnet build src\DoomsdayClock\DoomsdayClock.csproj -c Release
-```
+All JSON writes are atomic (write to a temp file, then rename), so a crash or
+power cut can't leave a half-written settings file.
 
-To produce the portable, double-click-and-run `.exe` (recommended - what
-the [Releases](../../releases) page ships):
+### The scheduled task
 
-```powershell
-dotnet publish src\DoomsdayClock\DoomsdayClock.csproj `
-  -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
-```
+Registered per user under `Task Scheduler Library\DoomsdayClock\WallpaperUpdate`,
+standard privileges, no UAC prompt:
 
-This produces `publish\DoomsdayClock.exe` — a single file, roughly 70-150 MB,
-that runs on a bare Windows 10/11 machine with **no** .NET runtime installed.
+- **Daily at 00:05**: the day count ticks over.
+- **At sign-in**: catches up if the PC was off or asleep at midnight
+  (`StartWhenAvailable` is also on).
+- **Every N hours**: added only when the quote schedule is “Custom”.
+- 2-minute execution limit, ignores new instances while one is running,
+  runs on battery.
 
-If you already have the .NET 8 Desktop Runtime installed (or don't mind
-installing it once) and would rather have a ~150 KB exe instead of a
-bundled one, publish framework-dependent instead:
+## Quotes
 
-```powershell
-dotnet publish src\DoomsdayClock\DoomsdayClock.csproj `
-  -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish
-```
-
-Every push to `main` and every tagged release (`vX.Y.Z`) is also built
-automatically by GitHub Actions — see `.github/workflows/build.yml` and
-`.github/workflows/release.yml`. Tagging a release (`git tag v1.0.0 && git
-push --tags`) automatically attaches a built `DoomsdayClock.exe` to a GitHub
-Release.
-
-## Running it
-
-- **Double-click `DoomsdayClock.exe`** → opens the settings window.
-- **`DoomsdayClock.exe --update`** → silently regenerates and applies
-  today's wallpaper, no window. This is what the Scheduled Task runs; you
-  can also run it yourself to force an immediate refresh (e.g. after
-  changing your monitor resolution).
-- **`DoomsdayClock.exe --uninstall`** → removes the Scheduled Task and
-  deletes the saved config. Equivalent to clicking "Disable Updates" in the
-  UI, but scriptable.
-
-No installer is provided or needed - it's one file, it writes nothing
-outside `%AppData%\DoomsdayClock\` and `%LocalAppData%\DoomsdayClock\`, and
-it makes no registry changes beyond the two standard wallpaper keys every
-"set wallpaper" tool touches.
-
-## The config file
-
-`%AppData%\DoomsdayClock\config.json`:
+### `quotes.json` format
 
 ```json
 {
-  "TargetDate": "2026-12-25T00:00:00",
-  "CreatedDate": "2026-09-13T00:00:00",
-  "ColorMode": "GradientToRed",
-  "FontFamilyName": "Gill Sans Nova Ultra Bold"
+  "quotes": [
+    { "text": "Lost time is never found again.", "author": "Benjamin Franklin" },
+    { "text": "The deadline doesn't move. You do." }
+  ]
 }
 ```
 
-- **`TargetDate`** — the deadline being counted down to.
-- **`CreatedDate`** — the day this particular countdown was configured.
-  This is "day zero" for the red-fade gradient: the text is pure white at
-  `CreatedDate` and pure red at `TargetDate`, linearly interpolated in
-  between. It resets automatically whenever you pick a *new* target date
-  in the UI, so the fade always spans the full life of whatever countdown
-  is currently active.
-- **`ColorMode`** — `"StaticWhite"` or `"GradientToRed"`.
-- **`FontFamilyName`** — the font the renderer tries first. Change this
-  (or just install the actual "Gill Sans Nova Ultra Bold" font) to use a
-  different typeface without touching code.
+- `author` is optional. `id` and `added` are filled in automatically, so you
+  can leave them out when adding quotes by hand.
+- A bare array (`[ {"text": "..."}, ... ]`) is also accepted for imports.
+- Quotes longer than 320 characters are rejected, since they won't fit
+  legibly on a wallpaper.
 
-You can hand-edit this file; the next `--update` run (or reopening the UI)
-picks up the change. Deleting it resets the app to "not configured" - the
-Scheduled Task will simply do nothing until you open the UI and save again.
+### Import rules
 
-## UI design philosophy
+- **Duplicates are skipped.** Matching ignores case, punctuation and spacing.
+- **New quotes go to the front of the queue**, in the order they appear in
+  the file.
+- The import result tells you how many were added, skipped and rejected.
 
-The settings window is deliberately **not** a flat, minimal, modern-Fluent
-form. It's a hand-painted homage to the Windows 7 "Aero" era: gradient glass
-panels, glossy rounded buttons with a highlight bubble, a draggable
-gradient title bar, and a soft OS-drawn drop shadow around a rounded
-window.
+### Rotation algorithm
 
-**Why hand-painted instead of real DWM glass/blur?** True Aero glass
-(`DwmEnableBlurBehindWindow`) was a Windows Vista/7-only compositor effect
-that Microsoft removed starting with Windows 8, and its unofficial
-Windows 10/11 replacement (`SetWindowCompositionAttribute`/Acrylic) is an
-**undocumented** API that can change or break without notice between
-Windows builds. Depending on it would make the UI fragile across OS
-versions for a purely cosmetic effect. Hand-painting the *look* of glass
-with GDI+ gradients and gloss overlays gets the same visual language, costs
-almost nothing to render (a handful of `LinearGradientBrush`/
-`PathGradientBrush` fills, cached where possible), and works identically
-on every Windows version from 8.1 through 11 - "modernizing and
-revitalizing" the aesthetic without depending on the deprecated
-implementation.
+- `priority` holds newly added quotes, **newest first**. Anything in it goes
+  up next.
+- `deck` is a shuffled pass over the whole library (Fisher–Yates with a tiny
+  built-in SplitMix64 generator, so no `rand` dependency).
+- When both are empty, everything reshuffles. The quote currently on screen
+  is kept off the top of the new deck, so the same quote never appears twice
+  in a row.
+- Quotes you add by editing `quotes.json` are detected on the next load and
+  treated exactly like quotes added in the app.
 
-- `UI/AeroPalette.cs` - all shared colours, fonts, and the two reusable
-  paint helpers (`RoundedRect`, `PaintGlossHighlight`) every custom control
-  uses. Change the palette here to re-theme the whole app in one place.
-- `UI/GlassButton.cs` - a `Control` subclass (not a themed `Button`) so its
-  paint isn't fought over by Windows' visual-styles engine. Has hover/press
-  states and four accent colours (`Blue`, `Green`, `Red`, `Neutral`).
-- `UI/GlassPanel.cs` - the sunken "well" grouping container with an
-  optional title, used for every section of the form.
-- `UI/SettingsForm.cs` - composes the above into the actual window,
-  including the borderless-window drag handling and rounded-region/
-  drop-shadow setup.
+### When a new quote is due
+
+- **Daily / weekly / monthly** are calendar-based (a new day, 7+ days, a new
+  month), so the quote flips with the countdown at midnight even if the task
+  ran late.
+- **Every N hours** is elapsed-time based with 10 minutes of slack, so a run
+  that fires a few seconds early still counts. One hour is the minimum.
+
+### About the bundled quotes
+
+73 are short attributed quotes from public-domain-era sources (Seneca,
+Marcus Aurelius, Franklin, Thoreau, Shakespeare, proverbs and so on). Commonly
+misattributed quotes were deliberately left out. The other 158 are original
+lines written for this project. Delete any you don't like from the Library
+list.
+
+## Performance
+
+Measured in the Linux development container (release build, same rendering code as Windows):
+
+| Operation | Time |
+|---|---|
+| Scheduled run when nothing changed | ~5 ms, no disk writes |
+| Scheduled run that redraws a 1920×1080 wallpaper | ~21 ms |
+| Settings window, idle | 0% CPU (reactive repaint only) |
+
+Choices that keep it light:
+
+- **Skip if unchanged.** Each run hashes everything that affects the image
+  (dates, colour mode, fonts, quote, monitor sizes) and exits immediately if
+  it matches the last render. An hourly task with a daily quote does almost
+  nothing 23 times a day.
+- **Font cache.** Scanning every installed font takes 100–300 ms on Windows.
+  The scheduled run reads the resolved file path from a cache and opens only
+  the two fonts it needs. The settings window scans on a background thread,
+  so the window opens instantly.
+- **One render per resolution.** Monitors that share a resolution share one
+  image file.
+- **One fill per text line.** All glyph outlines on a line go into a single
+  path and are rasterised once.
+- **Width-solved font size.** Text width is linear in font size, so the
+  headline size is calculated directly instead of being searched for.
+- **Alternating file names.** Windows sometimes ignores a wallpaper whose
+  path didn't change; flipping between two names guarantees the refresh
+  without writing a new file every day.
+- **Release profile.** Fat LTO, one codegen unit, `panic = "abort"`,
+  stripped symbols.
+
+## Building from source
+
+Requires Rust 1.95 or newer (the egui version used needs it) (`rustup` from <https://rustup.rs>).
+
+```powershell
+git clone <this repo>
+cd DoomsdayClock
+cargo build --release
+# -> target\release\DoomsdayClock.exe
+```
+
+- `cargo test` runs the unit tests (rotation schedule, queue order, import
+  dedupe, renderer centring and margins, BMP format, config migration).
+- GitHub Actions builds, lints (clippy with warnings as errors) and tests on
+  every push (`.github/workflows/build.yml`). Pushing a tag like `v2.0.0`
+  publishes a Release with the exe attached (`release.yml`).
+- The app also builds and runs on Linux for development. Wallpaper calls
+  become log lines and the scheduled task becomes a marker file. Useful
+  variables:
+  - `DOOMSDAY_CLOCK_HOME=<dir>` keeps all files in a sandbox folder.
+  - `DOOMSDAY_SCREEN=2560x1440` simulates a display size.
+  - `DOOMSDAY_START_PAGE=quotes|appearance` opens on a page (debug builds).
+
+### Dependencies, and why each one exists
+
+| Crate | Why |
+|---|---|
+| `eframe` / `egui` (glow) | The settings window. Every pixel is custom-painted, which both skins require. OpenGL renderer, much lighter than wgpu for a small idle 2D window. Default features off: no bundled fonts, no accessibility tree, no Wayland. |
+| `tiny-skia` | CPU rasteriser for the wallpaper. No GPU, no system dependencies. |
+| `fontdb`, `ttf-parser` | Find a font file by family name; read glyph outlines and kerning. |
+| `serde`, `serde_json` | Settings and quotes files. |
+| `chrono` | Local date and time (the standard library has no time zone support). |
+| `windows` | Microsoft's official Win32 bindings (Windows builds only). |
+| `raw-window-handle` | Read the window handle from eframe for the DWM calls (Windows only). |
 
 ## How to change common things
 
-| I want to... | Change this |
+| I want to… | Change |
 |---|---|
-| Use a different font | Edit `FontFamilyName` in a saved `config.json`, or change the default in `AppConfig.cs` and the fallback chain in `FontResolver.cs`. |
-| Change the red-fade colour | `ColorInterpolator.Red` (and `.White`) in `ColorInterpolator.cs`. |
-| Change the daily run time | `TaskSchedulerService.DailyRunTime` (a `"HH:mm"` string). |
-| Change the wallpaper text format | `WallpaperRenderer.BuildCountdownText(...)`. |
-| Re-theme the whole UI | `UI/AeroPalette.cs` - every colour used anywhere in the window lives there. |
-| Change the window size/layout | `UI/SettingsForm.cs` constructor - layout is explicit `Bounds`, top to bottom, no layout-engine magic to fight with. |
-| Add a new setting | Add a property to `AppConfig`, a control to `SettingsForm`, and read/write it in `BuildConfigFromControls()`. |
+| Use a different font | Type any installed family name, or a path to a `.ttf`/`.otf`, in **Countdown → Fonts**. Defaults live in `Config::default()` (`src/config.rs`); fallback chains in `Role::fallbacks()` (`src/fonts.rs`). |
+| Change the wallpaper text | `countdown::headline()` in `src/countdown.rs`. |
+| Change the fade colours | `WHITE` / `RED` in `src/countdown.rs`. |
+| Change text sizes or layout on the wallpaper | Constants at the top of `render::render()` (headline 84% width cap, quote at 3% of height, max 5 lines). |
+| Change when the task runs | `task_xml()` in `src/platform/windows.rs`. |
+| Re-colour a skin | The `Colors` tables in `src/ui/theme.rs`. Widget gradients are in `src/ui/widgets.rs` (each Aero gradient sits next to its normal/hover/pressed states). |
+| Add a setting | Add a field to `Config` (old files still load thanks to `#[serde(default)]`), add a control to a page in `src/ui/mod.rs`, and use it in `wallpaper.rs`. |
+| Add a page | Add a variant to `Page` and its `ALL` table, then a `*_left` / `*_right` pair in `src/ui/mod.rs`. |
+
+## Design notes
+
+- **Aero is rebuilt, not emulated.** Windows 7's blur-behind API stopped
+  producing blur after Windows 7. Windows 11 22H2 added a documented replacement
+  (`DWMWA_SYSTEMBACKDROP_TYPE`). The Aero skin layers a translucent sky-blue
+  tint, diagonal light streaks and a white top sheen over a live Acrylic
+  backdrop, so the blur is real. Everything else is drawn with gradient
+  meshes using colours sampled from Windows 7's controls: two-tone glossy
+  push buttons with a hover bloom, Explorer-blue selection, the Control
+  Panel task pane, a glossy monitor bezel around the preview, and the green
+  progress bar, which turns yellow at 75% and red at 90% just like Windows 7's
+  paused and error states.
+- **Modern follows WinUI 3.** Mica backdrop, a content layer with a rounded
+  corner, Fluent cards, accent pill navigation, toggle switches, segmented
+  choices and your system accent colour. Light, dark, or follow Windows.
+- **Same pages, different chrome.** Pages call skinned widgets and never
+  check which skin is active, so new features automatically appear in both
+  looks.
+- **Glass is opt-in by capability.** The backdrop is enabled only on Windows
+  builds that really implement it (22621+). Elsewhere both skins paint
+  opaque versions of the same design.
+
+## Troubleshooting
+
+- **“Not installed here — using … instead” under Fonts.** Gill Sans Nova is a
+  commercial font. If you have Microsoft 365, open Word, pick “Gill Sans Nova
+  Ultra Bold” once so Office downloads it (Office fetches cloud fonts on
+  first use), then reopen Doomsday Clock. The app
+  also looks in Office's cloud-font folder, which Windows doesn't. Or install
+  any `.ttf`/`.otf` and type its path.
+- **Windows SmartScreen warns about the exe.** The exe isn't code-signed.
+  Choose *More info → Run anyway*, or build it yourself.
+- **The wallpaper stopped updating after I moved the exe.** The task points
+  at the old location. Open the app from the new location and click
+  **Save & Activate** again.
+- **Check that the task ran.** Task Scheduler → `DoomsdayClock` →
+  *Last Run Result* should be `0x0`.
 
 ## Uninstalling
 
-Click **Disable Updates** in the app (removes the Scheduled Task), or run:
+- **Stop updates but keep settings:** Appearance → Background updates →
+  **Turn off**.
+- **Remove everything:** run `DoomsdayClock.exe --uninstall` (removes the
+  scheduled task and all settings, quotes and cached images), then delete the
+  exe.
 
-```powershell
-DoomsdayClock.exe --uninstall
-```
+Your current wallpaper stays until you change it.
 
-then delete the `.exe` itself and, if you want to remove the last-applied
-wallpaper image too, `%LocalAppData%\DoomsdayClock\`.
+## License
 
-## Why these engineering choices?
-
-A few decisions that might look surprising at first glance, explained:
-
-- **One `.exe`, two modes (`--update` / UI), instead of two separate
-  binaries.** A portable single-file app should stay a single file. The
-  Scheduled Task action is just `DoomsdayClock.exe --update` - nothing else
-  to keep track of on disk.
-- **`schtasks.exe` instead of a Task Scheduler NuGet library.** Zero extra
-  dependency, zero extra published bytes, and the interaction happens
-  exactly once per "Save" click - process-launch overhead is irrelevant at
-  that frequency, and it avoids COM interop's STA/RCW lifetime footguns for
-  a one-shot call.
-- **BMP, not PNG, for the cached wallpaper file.** `SPI_SETDESKWALLPAPER`
-  has guaranteed BMP support back to Windows XP. The file lives entirely in
-  our own AppData folder, so its larger size costs nothing.
-- **No `PublishTrimmed`.** WinForms leans on reflection-based
-  designer/serialization plumbing that doesn't trim safely yet. Chasing a
-  smaller binary at the risk of a runtime crash is the wrong trade for a
-  utility that has to work unattended, every day, without anyone watching.
-- **`InvariantGlobalization` is on.** The app only ever formats dates as
-  `dd-MM-yyyy`, manually, itself - it never needs the OS's regional ICU
-  data, so shipping it would be pure waste.
-- **No third-party NuGet packages**, aside from Microsoft's own
-  `Microsoft.Win32.Registry` (a first-party BCL package, not bundled with
-  every target framework by default). Fewer dependencies means less
-  supply-chain surface, a faster restore, and a smaller binary.
+MIT. See [LICENSE](LICENSE).

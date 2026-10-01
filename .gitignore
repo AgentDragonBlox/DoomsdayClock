@@ -1,14 +1,11 @@
-# Build output
-bin/
-obj/
-publish/
-out/
+# Rust build output
+/target/
 
-# Visual Studio / Rider
+# Editors
 .vs/
+.vscode/
 .idea/
-*.user
-*.suo
+*.swp
 
 # OS cruft
 .DS_Store
