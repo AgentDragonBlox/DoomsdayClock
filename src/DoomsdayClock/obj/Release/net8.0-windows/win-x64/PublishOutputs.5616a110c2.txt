@@ -1,0 +1,2 @@
+D:\Visual Studio Code\Projects\DoomsdayClock\publish\DoomsdayClock.pdb
+D:\Visual Studio Code\Projects\DoomsdayClock\publish\DoomsdayClock.exe
